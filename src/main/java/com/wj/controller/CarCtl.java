@@ -1,7 +1,7 @@
 package com.wj.controller;
 
 import com.wj.entity.HcMemberCar;
-import com.wj.formbean.Rtnvalue;
+import com.wj.formbean.JQListBean;
 import com.wj.service.CarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,10 +22,13 @@ public class CarCtl {
     private CarService carService;
 
     @RequestMapping(value = "list")
-    public Rtnvalue getCarlist(HttpServletRequest request){
-        Rtnvalue<HcMemberCar> rtnvalue = new Rtnvalue<>();
+    public JQListBean getCarlist(HttpServletRequest request){
+        JQListBean<HcMemberCar> rtnvalue = new JQListBean<>();
         List<HcMemberCar> list = carService.getCarlistSvc();
-        rtnvalue.setList(list);
+        rtnvalue.setRows(list);
+        rtnvalue.setCurrpage(1);
+        rtnvalue.setTotalpages(1);
+        rtnvalue.setTotalrecords(1);
         return rtnvalue;
     }
 }
