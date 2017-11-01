@@ -9,6 +9,7 @@ public class HcMemberCar {
     private String hmcownername;
     private String hmcownertel;
     private int hmcmile;
+    private String hmccartype;
 
     public int getHmcid() {
         return hmcid;
@@ -48,5 +49,13 @@ public class HcMemberCar {
 
     public void setHmcmile(int hmcmile) {
         this.hmcmile = hmcmile;
+    }
+
+    public String getHmccartype() {
+        return hmccartype;
+    }
+
+    public void setHmccartype(String hmccartype) {
+        this.hmccartype = hmccartype;
     }
 }
