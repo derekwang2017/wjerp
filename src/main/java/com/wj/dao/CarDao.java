@@ -1,5 +1,6 @@
 package com.wj.dao;
 
+import com.wj.entity.HcBusinessType;
 import com.wj.entity.HcMemberCar;
 import com.wj.entity.HcWorkOrder;
 import com.wj.formbean.OrderinfoFormBean;
@@ -36,7 +37,8 @@ public interface CarDao {
     @Options(useGeneratedKeys = true, keyProperty = "hwid")
     void insertWorkOrder(HcWorkOrder workOrder);
     
-    @Select("select a.hwid,a.hwserialno, b.hmccarplate carplate, b.hmcownername carownername, c.hbtname, b.hmccartype, a.hwenterdtm, d.hsname, a.hwstatus, a.hwbusinesstypeid businesstypeid" +
+    @Select("select a.hwid,a.hwserialno, b.hmccarplate carplate, b.hmcownername carownername, c.hbtname businesstypename," +
+            " b.hmccartype cartypename, a.hwenterdtm, d.hsname acceptstaffname, a.hwstatus, a.hwbusinesstypeid businesstypeid" +
             " from hc_workorder a" +
             " LEFT JOIN hc_member_car b on b.hmcid=a.hwmembercarid" +
             " LEFT JOIN hc_business_type c on c.hbtid=a.hwbusinesstypeid" +
@@ -51,4 +53,7 @@ public interface CarDao {
             " LEFT JOIN hc_staff d on d.hsid=a.hwacceptstaffid" +
             " where hwstatus<9 ${filter}")
     int getOrderinfolistsize(@Param("filter") String filter);
+
+    @Select("select * from hc_business_type")
+    List<HcBusinessType> getBusinessTypelist();
 }

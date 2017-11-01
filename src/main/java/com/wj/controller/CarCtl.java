@@ -2,7 +2,10 @@ package com.wj.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.wj.entity.HcBusinessType;
 import com.wj.entity.HcMemberCar;
+import com.wj.entity.HcWorkOrder;
+import com.wj.formbean.AcceptCarFormBean;
 import com.wj.formbean.JQListBean;
 import com.wj.formbean.OrderinfoFormBean;
 import com.wj.formbean.Rtnvalue;
@@ -40,7 +43,16 @@ public class CarCtl {
 
     @RequestMapping(value = "acceptcar")
     public Rtnvalue acceptCar(HttpServletRequest request){
-        Rtnvalue rtnvalue = new Rtnvalue<>();
+        Rtnvalue<HcWorkOrder> rtnvalue = new Rtnvalue<>();
+        String data = request.getParameter("data");
+        if(!Util.isEmpty(data)){  //JSON.toJSONString(data)
+            AcceptCarFormBean formBean = JSON.parseObject(data, AcceptCarFormBean.class);
+            HcWorkOrder hcWorkOrder = carService.acceptCarService(formBean);
+            rtnvalue.setObj(hcWorkOrder);
+        } else {
+            rtnvalue.setStatus(1);
+            rtnvalue.setMsg("参数错误");
+        }
 
         return rtnvalue;
     }
@@ -94,6 +106,24 @@ public class CarCtl {
         rtnvalue.setCurrpage(page);
         rtnvalue.setTotalpages(totalPage);
         rtnvalue.setTotalrecords(totalcnt);
+        return rtnvalue;
+    }
+
+    @RequestMapping(value = "getcarinfobycarplate")
+    public Rtnvalue getCarinfoByCarplate(HttpServletRequest request){
+        Rtnvalue<HcMemberCar> rtnvalue = new Rtnvalue<>();
+        String carplate = request.getParameter("carplate");
+        HcMemberCar hcMemberCar = carService.getCarinfoByCarplate(carplate);
+        rtnvalue.setObj(hcMemberCar);
+        return rtnvalue;
+    }
+
+
+    @RequestMapping(value = "getbusinesstypelist")
+    public Rtnvalue getBusinessTtypeList(HttpServletRequest request){
+        Rtnvalue<HcBusinessType> rtnvalue = new Rtnvalue<>();
+        List<HcBusinessType> list = carService.getBusinesstypelist();
+        rtnvalue.setList(list);
         return rtnvalue;
     }
 

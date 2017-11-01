@@ -1,6 +1,7 @@
 package com.wj.service;
 
 import com.wj.dao.CarDao;
+import com.wj.entity.HcBusinessType;
 import com.wj.entity.HcMemberCar;
 import com.wj.entity.HcWorkOrder;
 import com.wj.formbean.AcceptCarFormBean;
@@ -114,4 +115,11 @@ public class CarService {
         return carDao.getOrderinfolistsize(filter);
     }
 
+    public HcMemberCar getCarinfoByCarplate(String carplate){
+        return carDao.getMembercarByPlate(carplate);
+    }
+
+    public List<HcBusinessType> getBusinesstypelist(){
+        return carDao.getBusinessTypelist();
+    }
 }
