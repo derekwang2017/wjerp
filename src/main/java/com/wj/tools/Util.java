@@ -19,6 +19,17 @@ public class Util {
         return false;
     }
 
+    public static int converToInt(String str){
+        if(isEmpty(str)){
+            return 0;
+        }
+        try {
+            return Integer.parseInt(str);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
     public static String getNowYYYYMMDDHHMMSS() {
         String result = "";
         SimpleDateFormat l_sdf = new SimpleDateFormat("yyyyMMddHHmmss");

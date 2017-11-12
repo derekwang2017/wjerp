@@ -1,10 +1,10 @@
 package com.wj.service;
 
 import com.wj.dao.CarDao;
-import com.wj.entity.HcBusinessType;
-import com.wj.entity.HcMemberCar;
-import com.wj.entity.HcWorkOrder;
+import com.wj.entity.*;
 import com.wj.formbean.AcceptCarFormBean;
+import com.wj.formbean.OrderMtinfo;
+import com.wj.formbean.Orderinfo;
 import com.wj.formbean.OrderinfoFormBean;
 import com.wj.tools.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -121,5 +121,85 @@ public class CarService {
 
     public List<HcBusinessType> getBusinesstypelist(){
         return carDao.getBusinessTypelist();
+    }
+
+    public Orderinfo getOrderinfoByOrderid(int orderid){
+        Orderinfo orderinfo = carDao.getOrderinfoByOrderid(orderid);
+        List<OrderMtinfo> orderlist = carDao.getOrderMtList(orderid);
+        orderinfo.setMtlist(orderlist);
+
+        return orderinfo;
+    }
+
+    public List<OrderMtinfo> getOrderMtlist(int orderid){
+        return carDao.getOrderMtList(orderid);
+    }
+
+    public void saveOrderItem(OrderMtinfo orderitem){
+        /*String mttype = orderitem.getMttype();
+        int mttypeid = 0;
+        if(!Util.isEmpty(mttype)){
+            mttypeid = getMttypeid(mttype);
+        }
+        String brandname = orderitem.getMtbrandname();
+        int brandid = 0;
+        if(!Util.isEmpty(brandname)){
+            brandid = getMtBrandid(brandname);
+        }*/
+        if(orderitem!=null){
+             int hwmid = orderitem.getHwmid();
+             if(hwmid==0){
+                 HcWorkorderMaterial hcWorkorderMaterial = new HcWorkorderMaterial();
+                 hcWorkorderMaterial.setHwmhwid(orderitem.getHwmhwid());
+                 hcWorkorderMaterial.setHwmhmid(orderitem.getHwmhmid());
+                 hcWorkorderMaterial.setHwmamount(orderitem.getMtamount());
+                 hcWorkorderMaterial.setHwmunitprice(orderitem.getMtprice());
+                 hcWorkorderMaterial.setHwmtotalprice(orderitem.getHwmtotalprice());
+                 hcWorkorderMaterial.setHwmstaffid(1);
+                 hcWorkorderMaterial.setHwmcreatedtm(Util.getNowYYYYMMDDHHMMSS());
+                 carDao.insertWorkorderMaterial(hcWorkorderMaterial);
+             } else {
+                 HcWorkorderMaterial hcWorkorderMaterial = new HcWorkorderMaterial();
+                 hcWorkorderMaterial.setHwmid(hwmid);
+                 hcWorkorderMaterial.setHwmamount(orderitem.getMtamount());
+                 hcWorkorderMaterial.setHwmunitprice(orderitem.getMtprice());
+                 hcWorkorderMaterial.setHwmtotalprice(orderitem.getHwmtotalprice());
+                 carDao.updateHcWorkorderMaterial(hcWorkorderMaterial);
+             }
+        }
+    }
+
+    private int getMttypeid(String mttypename){
+        if(Util.isEmpty(mttypename)){
+            return 0;
+        }
+        HcMaterialCategory hcMaterialCategory = carDao.getCategoryByName(mttypename);
+        if(hcMaterialCategory!=null && hcMaterialCategory.getHmcid()>0){
+            return hcMaterialCategory.getHmcid();
+        } else {
+            hcMaterialCategory = new HcMaterialCategory();
+            hcMaterialCategory.setHmcname(mttypename);
+            carDao.insertHcMaterialCategory(hcMaterialCategory);
+            return hcMaterialCategory.getHmcid();
+        }
+    }
+
+    private int getMtBrandid(String brandname){
+        if(Util.isEmpty(brandname)){
+            return 0;
+        }
+        HcMaterialBrand hcMaterialBrand = carDao.getBrandByName(brandname);
+        if(hcMaterialBrand!=null && hcMaterialBrand.getHmbid()>0){
+            return hcMaterialBrand.getHmbid();
+        } else {
+            hcMaterialBrand = new HcMaterialBrand();
+            hcMaterialBrand.setHmbname(brandname);
+            carDao.insertHcMaterialBrand(hcMaterialBrand);
+            return hcMaterialBrand.getHmbid();
+        }
+    }
+
+    public void setWorkorderMaterialDelSvc(int hwmid){
+        carDao.setHcWorkorderMaterialDel(hwmid);
     }
 }

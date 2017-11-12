@@ -5,10 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.wj.entity.HcBusinessType;
 import com.wj.entity.HcMemberCar;
 import com.wj.entity.HcWorkOrder;
-import com.wj.formbean.AcceptCarFormBean;
-import com.wj.formbean.JQListBean;
-import com.wj.formbean.OrderinfoFormBean;
-import com.wj.formbean.Rtnvalue;
+import com.wj.formbean.*;
 import com.wj.service.CarService;
 import com.wj.tools.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -124,6 +121,63 @@ public class CarCtl {
         Rtnvalue<HcBusinessType> rtnvalue = new Rtnvalue<>();
         List<HcBusinessType> list = carService.getBusinesstypelist();
         rtnvalue.setList(list);
+        return rtnvalue;
+    }
+
+    //获取工单详情
+    @RequestMapping(value = "getorderinfo")
+    public Rtnvalue getOrderinfo(HttpServletRequest request){
+        Rtnvalue<Orderinfo> rtnvalue = new Rtnvalue<>();
+        String orderid = request.getParameter("orderid");
+        if(!Util.isEmpty(orderid)){
+            int orderidi = Util.converToInt(orderid);
+            Orderinfo orderinfo = carService.getOrderinfoByOrderid(orderidi);
+            rtnvalue.setObj(orderinfo);
+        }
+        return rtnvalue;
+    }
+
+    //获取工单材料
+    @RequestMapping(value = "getordermtlist")
+    public Rtnvalue getOrderMtlist(HttpServletRequest request){
+        Rtnvalue<OrderMtinfo> rtnvalue = new Rtnvalue<>();
+        String orderid = request.getParameter("orderid");
+        if(!Util.isEmpty(orderid)){
+            int orderidi = Util.converToInt(orderid);
+            List<OrderMtinfo> mtlist = carService.getOrderMtlist(orderidi);
+            rtnvalue.setList(mtlist);
+        }
+        return rtnvalue;
+    }
+
+
+    //添加工单材料
+    @RequestMapping(value = "saveordermt")
+    public Rtnvalue saveOrderMt(HttpServletRequest request){
+        Rtnvalue<OrderMtinfo> rtnvalue = new Rtnvalue<>();
+        String data = request.getParameter("data");
+        if(!Util.isEmpty(data)){
+            OrderMtinfo orderitem = JSON.parseObject(data, OrderMtinfo.class);
+            if(orderitem != null){
+                carService.saveOrderItem(orderitem);
+                int orderid = orderitem.getHwmhwid();
+                List<OrderMtinfo> mtlist = carService.getOrderMtlist(orderid);
+                rtnvalue.setList(mtlist);
+            }
+        }
+        return rtnvalue;
+    }
+
+
+    //删除工单材料
+    @RequestMapping(value = "delordermt")
+    public Rtnvalue delOrderMt(HttpServletRequest request){
+        Rtnvalue rtnvalue = new Rtnvalue<>();
+        String hwmid = request.getParameter("hwmid");
+        if(!Util.isEmpty(hwmid)){
+            int hwmidi = Util.converToInt(hwmid);
+            carService.setWorkorderMaterialDelSvc(hwmidi);
+        }
         return rtnvalue;
     }
 
