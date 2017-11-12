@@ -58,7 +58,7 @@ public interface CarDao {
     List<HcBusinessType> getBusinessTypelist();
     
     @Select("select a.hwid orderid, a.hwserialno serialno, c.hsname acceptorname, a.hwenterdtm entrydtm, b.hmccarplate carplate," +
-            "b.hmcownername, b.hmcownertel, b.hmccartype cartype, a.hwentrymile entermile, d.hbtname, a.hwtakecardtm takecardtm," +
+            "b.hmcownername carownername, b.hmcownertel carownertel, b.hmccartype cartype, a.hwentrymile entermile, d.hbtname orderbusiness, a.hwtakecardtm takecardtm," +
             "a.hwdesc orderdesc" +
             " from hc_workorder a" +
             " LEFT JOIN hc_member_car b on b.hmcid=a.hwmembercarid" +
