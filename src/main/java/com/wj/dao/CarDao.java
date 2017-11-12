@@ -60,20 +60,20 @@ public interface CarDao {
     @Select("select a.hwid orderid, a.hwserialno serialno, c.hsname acceptorname, a.hwenterdtm entrydtm, b.hmccarplate carplate," +
             "b.hmcownername, b.hmcownertel, b.hmccartype cartype, a.hwentrymile entermile, d.hbtname, a.hwtakecardtm takecardtm," +
             "a.hwdesc orderdesc" +
-            "from hc_workorder a" +
-            "LEFT JOIN hc_member_car b on b.hmcid=a.hwmembercarid" +
-            "LEFT JOIN hc_staff c on c.hsid=a.hwacceptstaffid" +
-            "LEFT JOIN hc_business_type d on d.hbtid=a.hwbusinesstypeid" +
-            "where a.hwid=#{orderid}")
+            " from hc_workorder a" +
+            " LEFT JOIN hc_member_car b on b.hmcid=a.hwmembercarid" +
+            " LEFT JOIN hc_staff c on c.hsid=a.hwacceptstaffid" +
+            " LEFT JOIN hc_business_type d on d.hbtid=a.hwbusinesstypeid" +
+            " where a.hwid=#{orderid}")
     Orderinfo getOrderinfoByOrderid(@Param("orderid") int orderid);
     
     @Select("select hwmid, hwmhmid, hwmtotalprice, c.hmcname mttype, b.hmname mtname, d.hmbname," +
             " a.hwmamount mtamount, a.hwmunitprice mtprice, b.hmunit mtunit" +
-            "from hc_workorder_material a" +
-            "LEFT JOIN hc_material_item b on b.hmid=a.hwmhmid" +
-            "LEFT JOIN hc_material_category c on c.hmcid=b.hmhmcid" +
-            "LEFT JOIN hc_material_brand d on d.hmbid=b.hmhmbid" +
-            "where hwmhwid=#{orderid} and hwmdelflag=0")
+            " from hc_workorder_material a" +
+            " LEFT JOIN hc_material_item b on b.hmid=a.hwmhmid" +
+            " LEFT JOIN hc_material_category c on c.hmcid=b.hmhmcid" +
+            " LEFT JOIN hc_material_brand d on d.hmbid=b.hmhmbid" +
+            " where hwmhwid=#{orderid} and hwmdelflag=0")
     List<OrderMtinfo> getOrderMtList(@Param("orderid") int orderid);
 
     @Select("select * from hc_material_category where hmcname = #{hmcname}")
