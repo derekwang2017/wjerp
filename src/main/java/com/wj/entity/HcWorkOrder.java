@@ -18,6 +18,7 @@ public class HcWorkOrder {
     private BigDecimal hwdiscount;
     private int hwacceptstaffid;
     private String hwserialno;
+    private int hwentrymile;
 
     public int getHwid() {
         return hwid;
@@ -113,5 +114,13 @@ public class HcWorkOrder {
 
     public void setHwserialno(String hwserialno) {
         this.hwserialno = hwserialno;
+    }
+
+    public int getHwentrymile() {
+        return hwentrymile;
+    }
+
+    public void setHwentrymile(int hwentrymile) {
+        this.hwentrymile = hwentrymile;
     }
 }

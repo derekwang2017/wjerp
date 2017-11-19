@@ -151,7 +151,7 @@ public class CarCtl {
     }
 
 
-    //添加工单材料
+    //保存工单材料
     @RequestMapping(value = "saveordermt")
     public Rtnvalue saveOrderMt(HttpServletRequest request){
         Rtnvalue<OrderMtinfo> rtnvalue = new Rtnvalue<>();
@@ -181,4 +181,20 @@ public class CarCtl {
         return rtnvalue;
     }
 
+    //添加工单材料
+    @RequestMapping(value = "addordermt")
+    public Rtnvalue addOrdermt(HttpServletRequest request){
+        Rtnvalue<OrderMtinfo> rtnvalue = new Rtnvalue<>();
+        String data = request.getParameter("data");
+        if(!Util.isEmpty(data)){
+            AddOrderMaterialItemFormBean formBean = JSON.parseObject(data, AddOrderMaterialItemFormBean.class);
+            if(formBean != null){
+                carService.addOrderSelectMaterialitem(formBean);
+                int orderid = formBean.getOrderid();
+                List<OrderMtinfo> mtlist = carService.getOrderMtlist(orderid);
+                rtnvalue.setList(mtlist);
+            }
+        }
+        return rtnvalue;
+    }
 }

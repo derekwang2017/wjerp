@@ -32,8 +32,8 @@ public interface CarDao {
     @Select("select count(1) from hc_workorder where hwenterdtm>=#{startdtm} and hwenterdtm<=#{enddtm}")
     int getTodayOrdercnt(@Param("startdtm") String startdtm, @Param("enddtm") String enddtm);
 
-    @Insert("insert into hc_workorder (hwmembercarid,hwbusinesstypeid,hwenterdtm,hwdesc,hwacceptstaffid,hwserialno)" +
-            " values (#{hwmembercarid},#{hwbusinesstypeid},#{hwenterdtm},#{hwdesc},#{hwacceptstaffid},#{hwserialno})")
+    @Insert("insert into hc_workorder (hwmembercarid,hwbusinesstypeid,hwenterdtm,hwdesc,hwacceptstaffid,hwserialno,hwentrymile)" +
+            " values (#{hwmembercarid},#{hwbusinesstypeid},#{hwenterdtm},#{hwdesc},#{hwacceptstaffid},#{hwserialno},#{hwentrymile})")
     @Options(useGeneratedKeys = true, keyProperty = "hwid")
     void insertWorkOrder(HcWorkOrder workOrder);
     
@@ -67,7 +67,7 @@ public interface CarDao {
             " where a.hwid=#{orderid}")
     Orderinfo getOrderinfoByOrderid(@Param("orderid") int orderid);
     
-    @Select("select hwmid, hwmhmid, hwmtotalprice, c.hmcname mttype, b.hmname mtname, d.hmbname," +
+    @Select("select hwmid, hwmhmid, hwmtotalprice, c.hmcname mttype, b.hmname mtname, d.hmbname mtbrandname," +
             " a.hwmamount mtamount, a.hwmunitprice mtprice, b.hmunit mtunit" +
             " from hc_workorder_material a" +
             " LEFT JOIN hc_material_item b on b.hmid=a.hwmhmid" +
@@ -83,13 +83,6 @@ public interface CarDao {
     @Options(useGeneratedKeys = true, keyProperty = "hmcid")
     void insertHcMaterialCategory(HcMaterialCategory hcMaterialCategory);
 
-    @Select("select * from hc_material_brand where hmbname = #{hmbname}")
-    HcMaterialBrand getBrandByName(@Param("hmbname") String hmbname);
-
-    @Insert("insert into hc_material_brand (hmbname) values (#{hmbname})")
-    @Options(useGeneratedKeys = true, keyProperty = "hmbid")
-    void insertHcMaterialBrand(HcMaterialBrand hcMaterialBrand);
-
     @Insert("insert into hc_workorder_material (hwmhwid, hwmhmid, hwmamount, hwmunitprice, hwmtotalprice, hwmstaffid, hwmcreatedtm)" +
             " values (#{hwmhwid}, #{hwmhmid}, #{hwmamount}, #{hwmunitprice}, #{hwmtotalprice}, #{hwmstaffid}, #{hwmcreatedtm})")
     @Options(useGeneratedKeys = true, keyProperty = "hwmid")
@@ -100,4 +93,7 @@ public interface CarDao {
 
     @Update("update hc_workorder_material set hwmamount=#{hwmamount}, hwmunitprice=#{hwmunitprice}, hwmtotalprice=#{hwmtotalprice} where hwmid=#{hwmid}")
     void updateHcWorkorderMaterial(HcWorkorderMaterial hcWorkorderMaterial);
+
+    @Select("select * from hc_workorder_material where hwmhwid=#{hwmhwid}")
+    List<HcWorkorderMaterial> getOrderMateriallist(@Param("hwmhwid") int hwmhwid);
 }

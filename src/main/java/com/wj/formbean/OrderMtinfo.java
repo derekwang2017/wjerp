@@ -88,4 +88,12 @@ public class OrderMtinfo {
     public void setHwmhwid(int hwmhwid) {
         this.hwmhwid = hwmhwid;
     }
+
+    public String getMtunit() {
+        return mtunit;
+    }
+
+    public void setMtunit(String mtunit) {
+        this.mtunit = mtunit;
+    }
 }
