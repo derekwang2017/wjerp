@@ -94,6 +94,6 @@ public interface CarDao {
     @Update("update hc_workorder_material set hwmamount=#{hwmamount}, hwmunitprice=#{hwmunitprice}, hwmtotalprice=#{hwmtotalprice} where hwmid=#{hwmid}")
     void updateHcWorkorderMaterial(HcWorkorderMaterial hcWorkorderMaterial);
 
-    @Select("select * from hc_workorder_material where hwmhwid=#{hwmhwid}")
+    @Select("select * from hc_workorder_material where hwmhwid=#{hwmhwid} and hwmdelflag=0")
     List<HcWorkorderMaterial> getOrderMateriallist(@Param("hwmhwid") int hwmhwid);
 }
