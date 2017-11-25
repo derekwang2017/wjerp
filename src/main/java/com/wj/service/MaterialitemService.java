@@ -114,4 +114,8 @@ public class MaterialitemService {
     public List<HcMaterialItem> getMaterialitemByIds(String ids){
         return materialitemDao.getMaterialitemByIds(ids);
     }
+
+    public void orderUseMtAmount(int hmid, BigDecimal useamount){
+        materialitemDao.useMaterialStockAmount(useamount, hmid);
+    }
 }

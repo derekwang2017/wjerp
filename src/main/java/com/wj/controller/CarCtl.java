@@ -159,10 +159,14 @@ public class CarCtl {
         if(!Util.isEmpty(data)){
             OrderMtinfo orderitem = JSON.parseObject(data, OrderMtinfo.class);
             if(orderitem != null){
-                carService.saveOrderItem(orderitem);
+                int status = carService.saveOrderItem(orderitem, 1);
                 int orderid = orderitem.getHwmhwid();
                 List<OrderMtinfo> mtlist = carService.getOrderMtlist(orderid);
                 rtnvalue.setList(mtlist);
+                if(status==-1){
+                    rtnvalue.setStatus(1);
+                    rtnvalue.setMsg("材料库存不足");
+                }
             }
         }
         return rtnvalue;
@@ -189,12 +193,82 @@ public class CarCtl {
         if(!Util.isEmpty(data)){
             AddOrderMaterialItemFormBean formBean = JSON.parseObject(data, AddOrderMaterialItemFormBean.class);
             if(formBean != null){
-                carService.addOrderSelectMaterialitem(formBean);
+                rtnvalue = carService.addOrderSelectMaterialitem(formBean);
                 int orderid = formBean.getOrderid();
                 List<OrderMtinfo> mtlist = carService.getOrderMtlist(orderid);
                 rtnvalue.setList(mtlist);
             }
+        } else {
+            rtnvalue.setStatus(1);
+            rtnvalue.setMsg("参数错误");
         }
+        return rtnvalue;
+    }
+
+    //工单结算
+    @RequestMapping(value = "settlement")
+    public Rtnvalue settlement(HttpServletRequest request){
+        Rtnvalue rtnvalue = new Rtnvalue<>();
+        String data = request.getParameter("data");
+        if(!Util.isEmpty(data)){
+            SetttlementFormBean formBean = JSON.parseObject(data, SetttlementFormBean.class);
+            if(formBean != null){
+                rtnvalue = carService.orderSettlement(formBean);
+            }
+        } else {
+            rtnvalue.setStatus(1);
+            rtnvalue.setMsg("参数错误");
+        }
+        return rtnvalue;
+    }
+
+    //工单收银
+    @RequestMapping(value = "payment")
+    public Rtnvalue payment(HttpServletRequest request){
+        Rtnvalue rtnvalue = new Rtnvalue<>();
+        String data = request.getParameter("data");
+        if(!Util.isEmpty(data)){
+            PaymentFormBean formBean = JSON.parseObject(data, PaymentFormBean.class);
+            if(formBean != null){
+                carService.orderPayment(formBean);
+            }
+        } else {
+            rtnvalue.setStatus(1);
+            rtnvalue.setMsg("参数错误");
+        }
+        return rtnvalue;
+    }
+
+    //工单交车
+    @RequestMapping(value = "takecar")
+    public Rtnvalue takecar(HttpServletRequest request){
+        Rtnvalue rtnvalue = new Rtnvalue<>();
+        String orderid = request.getParameter("orderid");
+        int orderidi = Util.converToInt(orderid);
+        if(orderidi>0){
+            int status = carService.orderTakeCar(orderidi);
+            if(status==-1){
+                rtnvalue.setStatus(1);
+                rtnvalue.setMsg("未收银不能交车");
+            }
+        } else {
+            rtnvalue.setStatus(1);
+            rtnvalue.setMsg("参数错误");
+        }
+
+        return rtnvalue;
+    }
+
+    //工单取消
+    @RequestMapping(value = "ordercancel")
+    public Rtnvalue ordercancel(HttpServletRequest request){
+        Rtnvalue rtnvalue = new Rtnvalue<>();
+        String orderid = request.getParameter("orderid");
+        int orderidi = Util.converToInt(orderid);
+        if(orderidi>0){
+            carService.cancelOrder(orderidi);
+        }
+
         return rtnvalue;
     }
 }

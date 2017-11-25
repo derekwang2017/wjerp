@@ -1,5 +1,6 @@
 package com.wj.formbean;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -18,6 +19,9 @@ public class Orderinfo {
     private String orderbusiness;
     private String takecardtm;
     private String orderdesc;
+    private BigDecimal hwworkhourprice;  //工时费
+    private BigDecimal totalmaterialprice;  //材料费
+    private int hwstatus;   //工单状态
     private List<OrderMtinfo> mtlist;
 
     public int getOrderid() {
@@ -122,5 +126,29 @@ public class Orderinfo {
 
     public void setMtlist(List<OrderMtinfo> mtlist) {
         this.mtlist = mtlist;
+    }
+
+    public BigDecimal getHwworkhourprice() {
+        return hwworkhourprice;
+    }
+
+    public void setHwworkhourprice(BigDecimal hwworkhourprice) {
+        this.hwworkhourprice = hwworkhourprice;
+    }
+
+    public BigDecimal getTotalmaterialprice() {
+        return totalmaterialprice;
+    }
+
+    public void setTotalmaterialprice(BigDecimal totalmaterialprice) {
+        this.totalmaterialprice = totalmaterialprice;
+    }
+
+    public int getHwstatus() {
+        return hwstatus;
+    }
+
+    public void setHwstatus(int hwstatus) {
+        this.hwstatus = hwstatus;
     }
 }

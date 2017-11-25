@@ -16,6 +16,7 @@ public class OrderMtinfo {
     private BigDecimal mtprice;
     private BigDecimal hwmtotalprice;
     private String mtunit;
+    private BigDecimal hmstock;  //当前材料库存
 
     public int getHwmid() {
         return hwmid;
@@ -95,5 +96,13 @@ public class OrderMtinfo {
 
     public void setMtunit(String mtunit) {
         this.mtunit = mtunit;
+    }
+
+    public BigDecimal getHmstock() {
+        return hmstock;
+    }
+
+    public void setHmstock(BigDecimal hmstock) {
+        this.hmstock = hmstock;
     }
 }

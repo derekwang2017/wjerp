@@ -6,6 +6,7 @@ import com.wj.formbean.Orderinfo;
 import com.wj.formbean.OrderinfoFormBean;
 import org.apache.ibatis.annotations.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -43,7 +44,7 @@ public interface CarDao {
             " LEFT JOIN hc_member_car b on b.hmcid=a.hwmembercarid" +
             " LEFT JOIN hc_business_type c on c.hbtid=a.hwbusinesstypeid" +
             " LEFT JOIN hc_staff d on d.hsid=a.hwacceptstaffid" +
-            " where hwstatus<9 ${filter}")
+            " where hwstatus<4 ${filter}")
     List<OrderinfoFormBean> getOrderinfolist(@Param("filter") String filter);
 
     @Select("select count(1)" +
@@ -59,7 +60,7 @@ public interface CarDao {
     
     @Select("select a.hwid orderid, a.hwserialno serialno, c.hsname acceptorname, a.hwenterdtm entrydtm, b.hmccarplate carplate," +
             "b.hmcownername carownername, b.hmcownertel carownertel, b.hmccartype cartype, a.hwentrymile entermile, d.hbtname orderbusiness, a.hwtakecardtm takecardtm," +
-            "a.hwdesc orderdesc" +
+            "a.hwdesc orderdesc, a.hwworkhourprice, a.hwstatus" +
             " from hc_workorder a" +
             " LEFT JOIN hc_member_car b on b.hmcid=a.hwmembercarid" +
             " LEFT JOIN hc_staff c on c.hsid=a.hwacceptstaffid" +
@@ -68,7 +69,7 @@ public interface CarDao {
     Orderinfo getOrderinfoByOrderid(@Param("orderid") int orderid);
     
     @Select("select hwmid, hwmhmid, hwmtotalprice, c.hmcname mttype, b.hmname mtname, d.hmbname mtbrandname," +
-            " a.hwmamount mtamount, a.hwmunitprice mtprice, b.hmunit mtunit" +
+            " a.hwmamount mtamount, a.hwmunitprice mtprice, b.hmunit mtunit, b.hmstock" +
             " from hc_workorder_material a" +
             " LEFT JOIN hc_material_item b on b.hmid=a.hwmhmid" +
             " LEFT JOIN hc_material_category c on c.hmcid=b.hmhmcid" +
@@ -96,4 +97,23 @@ public interface CarDao {
 
     @Select("select * from hc_workorder_material where hwmhwid=#{hwmhwid} and hwmdelflag=0")
     List<HcWorkorderMaterial> getOrderMateriallist(@Param("hwmhwid") int hwmhwid);
+
+    @Update("update hc_workorder set hwstatus=2, hwtotalamount=#{hwtotalamount}, hwworkhourprice=#{hwworkhourprice} where hwid=#{hwid}")
+    void orderSettlement(@Param("hwtotalamount") BigDecimal hwtotalamount, @Param("hwworkhourprice") BigDecimal hwworkhourprice, @Param("hwid") int hwid);
+
+    @Update("update hc_workorder set hwstatus=3, hwpayamount=#{hwpayamount}, hwdiscount=hwtotalamount-#{hwpayamount} where hwid=#{hwid}")
+    void orderPayment(@Param("hwpayamount") BigDecimal hwpayamount, @Param("hwid") int hwid);
+
+    @Insert("insert into hc_settlement_record (hsrorderid, hsrprice, hsrdtm, hsrstaffid) values (#{hsrorderid}, #{hsrprice}, #{hsrdtm}, #{hsrstaffid})")
+    @Options(useGeneratedKeys = true, keyProperty = "hsrid")
+    void insertSettlementRecord(HcSettlementRecord record);
+
+    @Update("update hc_workorder set hwstatus=4, hwtakecardtm=#{hwtakecardtm} where hwid=#{hwid}")
+    void orderTakeCar(@Param("hwtakecardtm") String hwtakecardtm, @Param("hwid") int hwid);
+
+    @Select("select * from hc_workorder where hwid=#{hwid}")
+    HcWorkOrder getOrderById(@Param("hwid") int hwid);
+
+    @Update("update hc_workorder set hwstatus=9 where hwid=#{hwid}")
+    void cancelOrder(@Param("hwid") int hwid);
 }

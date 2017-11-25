@@ -129,8 +129,13 @@ public class CarService {
 
     public Orderinfo getOrderinfoByOrderid(int orderid){
         Orderinfo orderinfo = carDao.getOrderinfoByOrderid(orderid);
-        List<OrderMtinfo> orderlist = carDao.getOrderMtList(orderid);
-        orderinfo.setMtlist(orderlist);
+        List<OrderMtinfo> ordermtlist = carDao.getOrderMtList(orderid);
+        orderinfo.setMtlist(ordermtlist);
+        BigDecimal totalMaterialPrice = calOrderMaterialTotalPrice(ordermtlist);
+        orderinfo.setTotalmaterialprice(totalMaterialPrice);
+        if(orderinfo.getHwworkhourprice()==null){
+            orderinfo.setHwworkhourprice(BigDecimal.ZERO);
+        }
         if(!Util.isEmpty(orderinfo.getEntrydtm())){
             orderinfo.setEntrydtm(Util.formartdispdate(orderinfo.getEntrydtm()));
         }
@@ -142,7 +147,8 @@ public class CarService {
         return carDao.getOrderMtList(orderid);
     }
 
-    public void saveOrderItem(OrderMtinfo orderitem){
+    //flag 1表示从页面直接修改工单材料信息，需要判断库存，0表示添加工单材料，已经判断过了， 这里不需要判断
+    public int saveOrderItem(OrderMtinfo orderitem, int flag){
         /*String mttype = orderitem.getMttype();
         int mttypeid = 0;
         if(!Util.isEmpty(mttype)){
@@ -155,6 +161,23 @@ public class CarService {
         }*/
         if(orderitem!=null){
              int hwmid = orderitem.getHwmid();
+             int hmid = orderitem.getHwmhmid();
+             if(hmid>0 && flag==1){
+                 HcMaterialItem hcMaterialItem = materialitemService.getMaterialInfoByid(hmid);
+                 if(hcMaterialItem!=null){
+                     BigDecimal hmstock = hcMaterialItem.getHmstock();
+                     if(hmstock==null){
+                         hmstock = BigDecimal.ZERO;
+                     }
+                     BigDecimal useamount = orderitem.getMtamount();
+                     if(useamount==null){
+                         useamount = BigDecimal.ZERO;
+                     }
+                     if(useamount.compareTo(hmstock) > 0){
+                        return -1;
+                     }
+                 }
+             }
              if(hwmid==0){
                  HcWorkorderMaterial hcWorkorderMaterial = new HcWorkorderMaterial();
                  hcWorkorderMaterial.setHwmhwid(orderitem.getHwmhwid());
@@ -174,6 +197,7 @@ public class CarService {
                  carDao.updateHcWorkorderMaterial(hcWorkorderMaterial);
              }
         }
+        return 0;
     }
 
     private int getMttypeid(String mttypename){
@@ -195,15 +219,23 @@ public class CarService {
         carDao.setHcWorkorderMaterialDel(hwmid);
     }
 
-    public void addOrderSelectMaterialitem(AddOrderMaterialItemFormBean formBean){
+    public Rtnvalue<OrderMtinfo> addOrderSelectMaterialitem(AddOrderMaterialItemFormBean formBean){
+        Rtnvalue<OrderMtinfo> rtnvalue = new Rtnvalue<>();
         if(Util.isEmpty(formBean.getMaterialids())){
-            return;
+            rtnvalue.setStatus(1);
+            rtnvalue.setMsg("参数错误");
+            return rtnvalue;
         }
         String[] mtidarr = formBean.getMaterialids().split(",");
         List<HcMaterialItem> materiallist = materialitemService.getMaterialitemByIds(formBean.getMaterialids());
         Map<Integer, HcMaterialItem> materialItemMap = new HashMap<>();
         if(materiallist!=null && materiallist.size()>0){
             for(HcMaterialItem item : materiallist){
+                if(item.getHmstock()==null || item.getHmstock().compareTo(BigDecimal.ZERO)==0){
+                    rtnvalue.setStatus(1);
+                    rtnvalue.setMsg("材料[" + item.getHmname() + "]库存不足");
+                    return rtnvalue;
+                }
                 materialItemMap.put(item.getHmid(), item);
             }
         }
@@ -227,9 +259,145 @@ public class CarService {
                     orderitem.setMtprice(materialItem.getHmprice());
                     orderitem.setHwmtotalprice(materialItem.getHmprice());
 
-                    saveOrderItem(orderitem);
+                    saveOrderItem(orderitem, 0);
                 }
             }
         }
+
+        return rtnvalue;
+    }
+
+    //计算工单使用材料总金额
+    private BigDecimal calOrderMaterialTotalPrice(List<OrderMtinfo> mtlist){
+        BigDecimal totalmtprice = BigDecimal.ZERO;
+        if(mtlist!=null && mtlist.size()>0){
+            for(OrderMtinfo mt : mtlist){
+                BigDecimal mtprice = mt.getHwmtotalprice();
+                if(mtprice==null){
+                    mtprice = BigDecimal.ZERO;
+                }
+                totalmtprice = totalmtprice.add(mtprice);
+            }
+        }
+        return totalmtprice;
+    }
+
+    //判断工单使用材料库存是否充足
+    private String validOrderMaterialStockAmount(List<OrderMtinfo> mtlist){
+        if(mtlist!=null && mtlist.size()>0){
+            for(OrderMtinfo mt : mtlist){
+                BigDecimal mtstock = mt.getHmstock();  //库存
+                BigDecimal useamount = mt.getMtamount(); //使用数量
+                if(mtstock==null){
+                    mtstock = BigDecimal.ZERO;
+                }
+                if(useamount==null){
+                    useamount = BigDecimal.ZERO;
+                }
+                if(useamount.compareTo(mtstock) > 0){
+                    return mt.getMtname();
+                }
+            }
+        }
+
+        return "";
+    }
+
+    //工单结算
+    public Rtnvalue orderSettlement(SetttlementFormBean formBean){
+        Rtnvalue rtnvalue = new Rtnvalue<>();
+        int orderid = formBean.getOrderid();
+        List<OrderMtinfo> mtlist = getOrderMtlist(orderid);
+        String notStockMt = validOrderMaterialStockAmount(mtlist);
+        if(!Util.isEmpty(notStockMt)){
+            rtnvalue.setStatus(1);
+            rtnvalue.setMsg("材料[" + notStockMt + "]库存不足，结算失败");
+            return rtnvalue;
+        }
+        BigDecimal totalmtprice = calOrderMaterialTotalPrice(mtlist);
+        BigDecimal workhourprice = formBean.getWorkhourprice();
+        if(workhourprice==null){
+            workhourprice = BigDecimal.ZERO;
+        }
+        BigDecimal totalprice = totalmtprice.add(workhourprice);
+
+        carDao.orderSettlement(totalprice, workhourprice, orderid);
+
+        rtnvalue.setMsg("结算成功");
+        return rtnvalue;
+    }
+
+    //工单收银
+    public Rtnvalue orderPayment(PaymentFormBean formBean){
+        Rtnvalue rtnvalue = new Rtnvalue<>();
+        int orderid = formBean.getOrderid();
+        HcWorkOrder hcWorkOrder = getOrderByid(orderid);
+        if(hcWorkOrder!=null && hcWorkOrder.getHwstatus()!=2){  //未结算不能收银
+            rtnvalue.setStatus(1);
+            rtnvalue.setMsg("未结算不能收银");
+            return rtnvalue;
+        }
+        List<OrderMtinfo> mtlist = getOrderMtlist(orderid);
+        //验证库存是否充足
+        String notStockMt = validOrderMaterialStockAmount(mtlist);
+        if(!Util.isEmpty(notStockMt)){
+            rtnvalue.setStatus(1);
+            rtnvalue.setMsg("材料[" + notStockMt + "]库存不足，收银失败");
+            return rtnvalue;
+        }
+
+        //扣除材料库存
+        if(mtlist!=null && mtlist.size()>0){
+            for(OrderMtinfo mt : mtlist){
+                //扣除库存
+                materialitemService.orderUseMtAmount(mt.getHwmhmid(), mt.getMtamount());
+                //使用记录
+                materialitemService.insertMaterialStockRecord(mt.getHwmhmid(), 1, mt.getMtamount(), mt.getMtprice(), 1, orderid);
+            }
+        }
+
+
+        BigDecimal payprice = formBean.getRealpayamount();
+        if(payprice==null){
+            payprice = BigDecimal.ZERO;
+        }
+
+        carDao.orderPayment(payprice, orderid);
+
+        //插入收银记录
+        insertOrderSettlementRecord(orderid, payprice);
+
+        rtnvalue.setMsg("收银成功");
+        return rtnvalue;
+    }
+
+
+    //插入收银记录
+    public void insertOrderSettlementRecord(int orderid, BigDecimal price){
+        HcSettlementRecord record = new HcSettlementRecord();
+        record.setHsrorderid(orderid);
+        record.setHsrprice(price);
+        record.setHsrdtm(Util.getNowYYYYMMDDHHMMSS());
+        record.setHsrstaffid(1);
+        carDao.insertSettlementRecord(record);
+    }
+
+
+    //工单交车
+    public int orderTakeCar(int orderid){
+        HcWorkOrder hcWorkOrder = getOrderByid(orderid);
+        if(hcWorkOrder!=null && hcWorkOrder.getHwstatus()!=3){  //未收银不能交车
+            return -1;
+        }
+        carDao.orderTakeCar(Util.getNowYYYYMMDDHHMMSS(), orderid);
+        return 0;
+    }
+
+    public HcWorkOrder getOrderByid(int orderid){
+        return carDao.getOrderById(orderid);
+    }
+
+    public void cancelOrder(int orderid){
+        carDao.cancelOrder(orderid);
     }
 }

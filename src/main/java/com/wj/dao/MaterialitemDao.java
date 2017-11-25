@@ -73,4 +73,8 @@ public interface MaterialitemDao {
 
     @Select("select * from hc_material_item where hmid in (${ids})")
     List<HcMaterialItem> getMaterialitemByIds(@Param("ids") String ids);
+
+    @Update("update hc_material_item set hmstock=hmstock - #{hmstock} where hmid=#{hmid}")
+    void useMaterialStockAmount(@Param("hmstock") BigDecimal hmstock, @Param("hmid") int hmid);
+
 }
