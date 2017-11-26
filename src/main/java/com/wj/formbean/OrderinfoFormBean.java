@@ -1,5 +1,7 @@
 package com.wj.formbean;
 
+import java.math.BigDecimal;
+
 /**
  * Created by 87831 on 2017/11/1/0001.
  */
@@ -15,6 +17,8 @@ public class OrderinfoFormBean {
     private String orderstatusname;  //工单状态显示
     private int hwstatus;  //工单状态
     private int businesstypeid;  //业务类别
+    private BigDecimal hwtotalamount;  //应收总金额
+    private BigDecimal hwpayamount;    //实收总金额
 
     public int getHwid() {
         return hwid;
@@ -102,5 +106,21 @@ public class OrderinfoFormBean {
 
     public void setBusinesstypeid(int businesstypeid) {
         this.businesstypeid = businesstypeid;
+    }
+
+    public BigDecimal getHwtotalamount() {
+        return hwtotalamount;
+    }
+
+    public void setHwtotalamount(BigDecimal hwtotalamount) {
+        this.hwtotalamount = hwtotalamount;
+    }
+
+    public BigDecimal getHwpayamount() {
+        return hwpayamount;
+    }
+
+    public void setHwpayamount(BigDecimal hwpayamount) {
+        this.hwpayamount = hwpayamount;
     }
 }

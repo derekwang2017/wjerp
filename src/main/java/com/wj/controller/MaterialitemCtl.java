@@ -36,27 +36,6 @@ public class MaterialitemCtl {
         if(!Util.isEmpty(data)){
             OrderinfoFormBean formBean = JSON.parseObject(JSON.toJSONString(data), OrderinfoFormBean.class);
             if(formBean!=null){
-                if(!Util.isEmpty(formBean.getHwserialno())){
-                    searchFilter += " and hwserialno like '%" + formBean.getHwserialno() + "%'";
-                }
-                if(!Util.isEmpty(formBean.getCarplate())){
-                    searchFilter += " and hmccarplate like '%" + formBean.getCarplate() + "%'";
-                }
-                if(!Util.isEmpty(formBean.getCarownername())){
-                    searchFilter += " and hmcownername like '%" + formBean.getCarownername() + "%'";
-                }
-                if(formBean.getBusinesstypeid()>0){
-                    searchFilter += " and hwbusinesstypeid =" + formBean.getBusinesstypeid();
-                }
-                if(!Util.isEmpty(formBean.getHwenterdtm())){
-                    searchFilter += " and hwenterdtm >='" + formBean.getHwenterdtm() + "000000' and hwenterdtm<='" + formBean.getHwenterdtm() + "235959'";
-                }
-                if(!Util.isEmpty(formBean.getAcceptstaffname())){
-                    searchFilter += " and d.hsname like '%" + formBean.getAcceptstaffname() + "%'";
-                }
-                if(formBean.getHwstatus()>-1){
-                    searchFilter += " and hwstatus=" + formBean.getHwstatus();
-                }
             }
         }
         String limitstr = Util.getLimitstr(page, rows);

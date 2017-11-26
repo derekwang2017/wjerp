@@ -63,7 +63,26 @@ public class CarCtl {
                                     @RequestParam(value="_search",defaultValue="",required=false) boolean search,
                                     HttpServletRequest request){
         String data = request.getParameter("data");
-        String searchFilter = "";
+        String searchFilter = " where hwstatus<4 ";
+        return generageOrderlistData(data, searchFilter, page, rows);
+    }
+
+
+    //完成工单历史列表
+    @RequestMapping(value = "historyorderlist")
+    public JQListBean historyOrderlist(@RequestParam(value="page",defaultValue="0",required=false) int page,
+                                    @RequestParam(value="rows",defaultValue="0",required=false) int rows,
+                                    @RequestParam(value="sidx",defaultValue="riitemid",required=false) String sidx,
+                                    @RequestParam(value="sord",defaultValue="asc",required=false) String sord,
+                                    @RequestParam(value="_search",defaultValue="",required=false) boolean search,
+                                    HttpServletRequest request){
+        String data = request.getParameter("data");
+        String searchFilter = " where hwstatus in (4,9) ";
+
+        return generageOrderlistData(data, searchFilter, page, rows);
+    }
+
+    private JQListBean generageOrderlistData(String data, String searchFilter, int page, int rows){
         if(!Util.isEmpty(data)){
             OrderinfoFormBean formBean = JSON.parseObject(JSON.toJSONString(data), OrderinfoFormBean.class);
             if(formBean!=null){

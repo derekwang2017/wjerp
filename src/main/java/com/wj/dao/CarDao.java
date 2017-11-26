@@ -39,12 +39,13 @@ public interface CarDao {
     void insertWorkOrder(HcWorkOrder workOrder);
     
     @Select("select a.hwid,a.hwserialno, b.hmccarplate carplate, b.hmcownername carownername, c.hbtname businesstypename," +
-            " b.hmccartype cartypename, a.hwenterdtm, d.hsname acceptstaffname, a.hwstatus, a.hwbusinesstypeid businesstypeid" +
+            " b.hmccartype cartypename, a.hwenterdtm, d.hsname acceptstaffname, a.hwstatus, a.hwbusinesstypeid businesstypeid," +
+            " a.hwtotalamount, a.hwpayamount" +
             " from hc_workorder a" +
             " LEFT JOIN hc_member_car b on b.hmcid=a.hwmembercarid" +
             " LEFT JOIN hc_business_type c on c.hbtid=a.hwbusinesstypeid" +
             " LEFT JOIN hc_staff d on d.hsid=a.hwacceptstaffid" +
-            " where hwstatus<4 ${filter}")
+            " ${filter}")
     List<OrderinfoFormBean> getOrderinfolist(@Param("filter") String filter);
 
     @Select("select count(1)" +
@@ -52,7 +53,7 @@ public interface CarDao {
             " LEFT JOIN hc_member_car b on b.hmcid=a.hwmembercarid" +
             " LEFT JOIN hc_business_type c on c.hbtid=a.hwbusinesstypeid" +
             " LEFT JOIN hc_staff d on d.hsid=a.hwacceptstaffid" +
-            " where hwstatus<9 ${filter}")
+            " ${filter}")
     int getOrderinfolistsize(@Param("filter") String filter);
 
     @Select("select * from hc_business_type")
