@@ -108,4 +108,35 @@ public class MaterialitemCtl {
         return rtnvalue;
     }
 
+    //当前材料列表
+    @RequestMapping(value = "recordlist")
+    public JQListBean getRecordList(@RequestParam(value="page",defaultValue="0",required=false) int page,
+                              @RequestParam(value="rows",defaultValue="0",required=false) int rows,
+                              @RequestParam(value="sidx",defaultValue="hmid",required=false) String sidx,
+                              @RequestParam(value="sord",defaultValue="asc",required=false) String sord,
+                              @RequestParam(value="_search",defaultValue="",required=false) boolean search,
+                              HttpServletRequest request){
+        String data = request.getParameter("data");
+        String searchFilter = "";
+        if(!Util.isEmpty(data)){
+            MaterialRecordFormBean formBean = JSON.parseObject(JSON.toJSONString(data), MaterialRecordFormBean.class);
+            if(formBean!=null){
+
+            }
+        }
+        String limitstr = Util.getLimitstr(page, rows);
+        String orderstr = " order by " + sidx + " " + sord;
+        JQListBean<MaterialRecordFormBean> rtnvalue = new JQListBean<>();
+        List<MaterialRecordFormBean> list = materialitemService.getMaterialRecordlistService(searchFilter + orderstr + limitstr);
+        int totalcnt = materialitemService.getMaterialRecordlistSizeService(searchFilter);
+        int totalPage = 0;
+        if(totalcnt > 0) {
+            totalPage = (int)Math.ceil(totalcnt / (rows * 1.0f));
+        }
+        rtnvalue.setRows(list);
+        rtnvalue.setCurrpage(page);
+        rtnvalue.setTotalpages(totalPage);
+        rtnvalue.setTotalrecords(totalcnt);
+        return rtnvalue;
+    }
 }

@@ -5,6 +5,7 @@ import com.wj.entity.HcMaterialCategory;
 import com.wj.entity.HcMaterialItem;
 import com.wj.entity.HcMaterialStockRecord;
 import com.wj.formbean.MaterialListFormbean;
+import com.wj.formbean.MaterialRecordFormBean;
 import org.apache.ibatis.annotations.*;
 
 import java.math.BigDecimal;
@@ -76,5 +77,21 @@ public interface MaterialitemDao {
 
     @Update("update hc_material_item set hmstock=hmstock - #{hmstock} where hmid=#{hmid}")
     void useMaterialStockAmount(@Param("hmstock") BigDecimal hmstock, @Param("hmid") int hmid);
+
+    @Select("select b.hmname, b.hmunit, c.hwserialno orderno, d.hsname staffname, a.*" +
+            " from hc_material_stock_record a" +
+            " LEFT JOIN hc_material_item b on b.hmid=a.hmsrhmid" +
+            " LEFT JOIN hc_workorder c on c.hwid=a.hmsrrelationid and a.hmsrstocktype=1" +
+            " LEFT JOIN hc_staff d on d.hsid=a.hmsrstaffid" +
+            " ${filter}")
+    List<MaterialRecordFormBean> getMaterialRecordlist(@Param("filter") String filter);
+
+    @Select("select count(1)" +
+            " from hc_material_stock_record a" +
+            " LEFT JOIN hc_material_item b on b.hmid=a.hmsrhmid" +
+            " LEFT JOIN hc_workorder c on c.hwid=a.hmsrrelationid and a.hmsrstocktype=1" +
+            " LEFT JOIN hc_staff d on d.hsid=a.hmsrstaffid" +
+            " ${filter}")
+    int getMaterialRecordlistSize(@Param("filter") String filter);
 
 }

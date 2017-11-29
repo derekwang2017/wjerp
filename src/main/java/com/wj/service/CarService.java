@@ -256,8 +256,8 @@ public class CarService {
                     orderitem.setHwmhwid(formBean.getOrderid());
                     orderitem.setHwmhmid(hmid);
                     orderitem.setMtamount(BigDecimal.ONE);
-                    orderitem.setMtprice(materialItem.getHmprice());
-                    orderitem.setHwmtotalprice(materialItem.getHmprice());
+                    orderitem.setMtprice(materialItem.getHmsaleprice());  //默认使用材料销价
+                    orderitem.setHwmtotalprice(materialItem.getHmsaleprice());
 
                     saveOrderItem(orderitem, 0);
                 }

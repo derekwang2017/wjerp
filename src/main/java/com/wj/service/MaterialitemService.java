@@ -6,6 +6,7 @@ import com.wj.entity.HcMaterialCategory;
 import com.wj.entity.HcMaterialItem;
 import com.wj.entity.HcMaterialStockRecord;
 import com.wj.formbean.MaterialListFormbean;
+import com.wj.formbean.MaterialRecordFormBean;
 import com.wj.tools.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -117,5 +118,13 @@ public class MaterialitemService {
 
     public void orderUseMtAmount(int hmid, BigDecimal useamount){
         materialitemDao.useMaterialStockAmount(useamount, hmid);
+    }
+
+    public List<MaterialRecordFormBean> getMaterialRecordlistService(String filter){
+        return materialitemDao.getMaterialRecordlist(filter);
+    }
+
+    public int getMaterialRecordlistSizeService(String filter){
+        return materialitemDao.getMaterialRecordlistSize(filter);
     }
 }
