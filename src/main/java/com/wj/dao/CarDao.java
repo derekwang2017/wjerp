@@ -27,7 +27,7 @@ public interface CarDao {
     @Options(useGeneratedKeys = true, keyProperty = "hmcid")
     void insertMemberCar(HcMemberCar hcMemberCar);
 
-    @Select("select * from hc_workorder where hwmembercarid=#{membercarid} and hwstatus<9 order by hwid limit 1")
+    @Select("select * from hc_workorder where hwmembercarid=#{membercarid} and hwstatus<4 order by hwid limit 1")
     HcWorkOrder getCurWorkOrder(@Param("membercarid") int membercarid);
 
     @Select("select count(1) from hc_workorder where hwenterdtm>=#{startdtm} and hwenterdtm<=#{enddtm}")
@@ -40,7 +40,7 @@ public interface CarDao {
     
     @Select("select a.hwid,a.hwserialno, b.hmccarplate carplate, b.hmcownername carownername, c.hbtname businesstypename," +
             " b.hmccartype cartypename, a.hwenterdtm, d.hsname acceptstaffname, a.hwstatus, a.hwbusinesstypeid businesstypeid," +
-            " a.hwtotalamount, a.hwpayamount" +
+            " a.hwtotalamount, a.hwpayamount, a.hwtakecardtm" +
             " from hc_workorder a" +
             " LEFT JOIN hc_member_car b on b.hmcid=a.hwmembercarid" +
             " LEFT JOIN hc_business_type c on c.hbtid=a.hwbusinesstypeid" +

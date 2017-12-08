@@ -84,7 +84,7 @@ public class CarCtl {
 
     private JQListBean generageOrderlistData(String data, String searchFilter, int page, int rows){
         if(!Util.isEmpty(data)){
-            OrderinfoFormBean formBean = JSON.parseObject(JSON.toJSONString(data), OrderinfoFormBean.class);
+            OrderinfoFormBean formBean = JSON.parseObject(data, OrderinfoFormBean.class);
             if(formBean!=null){
                 if(!Util.isEmpty(formBean.getHwserialno())){
                     searchFilter += " and hwserialno like '%" + formBean.getHwserialno() + "%'";
@@ -99,13 +99,30 @@ public class CarCtl {
                     searchFilter += " and hwbusinesstypeid =" + formBean.getBusinesstypeid();
                 }
                 if(!Util.isEmpty(formBean.getHwenterdtm())){
-                    searchFilter += " and hwenterdtm >='" + formBean.getHwenterdtm() + "000000' and hwenterdtm<='" + formBean.getHwenterdtm() + "235959'";
+                    searchFilter += " and hwenterdtm >='" + formBean.getHwenterdtm() + "000000'";
                 }
+                if(!Util.isEmpty(formBean.getHwenterdtm2())){
+                    searchFilter += " and hwenterdtm <='" + formBean.getHwenterdtm2() + "235959'";
+                }
+
+                if(!Util.isEmpty(formBean.getHwtakecardtm())){
+                    searchFilter += " and hwtakecardtm >='" + formBean.getHwtakecardtm() + "000000'";
+                }
+                if(!Util.isEmpty(formBean.getHwtakecardtm2())){
+                    searchFilter += " and hwtakecardtm <='" + formBean.getHwtakecardtm2() + "235959'";
+                }
+
                 if(!Util.isEmpty(formBean.getAcceptstaffname())){
                     searchFilter += " and d.hsname like '%" + formBean.getAcceptstaffname() + "%'";
                 }
                 if(formBean.getHwstatus()>-1){
                     searchFilter += " and hwstatus=" + formBean.getHwstatus();
+                }
+                if(!Util.isEmpty(formBean.getBusinesstypename())){
+                    searchFilter += " and hbtname like '%" + formBean.getBusinesstypename() + "%'";
+                }
+                if(!Util.isEmpty(formBean.getCartypename())){
+                    searchFilter += " and hmccartype like '%" + formBean.getCartypename() + "%'";
                 }
             }
         }
@@ -185,6 +202,9 @@ public class CarCtl {
                 if(status==-1){
                     rtnvalue.setStatus(1);
                     rtnvalue.setMsg("材料库存不足");
+                } else if(status==-2){
+                    rtnvalue.setStatus(1);
+                    rtnvalue.setMsg("工单已经结算，不可修改工单材料");
                 }
             }
         }

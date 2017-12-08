@@ -13,12 +13,15 @@ public class OrderinfoFormBean {
     private String businesstypename;  //业务类别名称
     private String cartypename;  //车型名称
     private String hwenterdtm;   //进场时间
+    private String hwenterdtm2;   //进场时间  查询用
     private String acceptstaffname;  //接待人员
     private String orderstatusname;  //工单状态显示
     private int hwstatus;  //工单状态
     private int businesstypeid;  //业务类别
     private BigDecimal hwtotalamount;  //应收总金额
     private BigDecimal hwpayamount;    //实收总金额
+    private String hwtakecardtm;  //交车时间
+    private String hwtakecardtm2;  //交车时间   查询用
 
     public int getHwid() {
         return hwid;
@@ -122,5 +125,29 @@ public class OrderinfoFormBean {
 
     public void setHwpayamount(BigDecimal hwpayamount) {
         this.hwpayamount = hwpayamount;
+    }
+
+    public String getHwenterdtm2() {
+        return hwenterdtm2;
+    }
+
+    public void setHwenterdtm2(String hwenterdtm2) {
+        this.hwenterdtm2 = hwenterdtm2;
+    }
+
+    public String getHwtakecardtm() {
+        return hwtakecardtm;
+    }
+
+    public void setHwtakecardtm(String hwtakecardtm) {
+        this.hwtakecardtm = hwtakecardtm;
+    }
+
+    public String getHwtakecardtm2() {
+        return hwtakecardtm2;
+    }
+
+    public void setHwtakecardtm2(String hwtakecardtm2) {
+        this.hwtakecardtm2 = hwtakecardtm2;
     }
 }

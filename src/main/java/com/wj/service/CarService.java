@@ -160,6 +160,11 @@ public class CarService {
             brandid = getMtBrandid(brandname);
         }*/
         if(orderitem!=null){
+            int orderid = orderitem.getHwmhwid();
+            HcWorkOrder hcWorkOrder = carDao.getOrderById(orderid);
+            if(hcWorkOrder!=null && hcWorkOrder.getHwstatus()!=0){
+                return -2;
+            }
              int hwmid = orderitem.getHwmid();
              int hmid = orderitem.getHwmhmid();
              if(hmid>0 && flag==1){
@@ -226,6 +231,14 @@ public class CarService {
             rtnvalue.setMsg("参数错误");
             return rtnvalue;
         }
+
+        HcWorkOrder hcWorkOrder = carDao.getOrderById(formBean.getOrderid());
+        if(hcWorkOrder!=null && hcWorkOrder.getHwstatus()!=0){
+            rtnvalue.setStatus(1);
+            rtnvalue.setMsg("工单已经结算，不可修改工单材料");
+            return rtnvalue;
+        }
+
         String[] mtidarr = formBean.getMaterialids().split(",");
         List<HcMaterialItem> materiallist = materialitemService.getMaterialitemByIds(formBean.getMaterialids());
         Map<Integer, HcMaterialItem> materialItemMap = new HashMap<>();
